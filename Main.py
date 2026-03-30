@@ -47,10 +47,50 @@ def login():
 
 # मुख्य प्रोग्राम (Main Logic)
 if __name__ == "__main__":
-    print("नमस्ते! विकासकलरआर्ट कम्युनिटी ऐप में आपका स्वागत है।")
+    print("नमस्ते! RangSetuHub ऐप में आपका स्वागत है।")
     choice = input("1. रजिस्टर 2. लॉगिन : ")
     
     if choice == '1':
         register()
     elif choice == '2':
         login()
+
+import json
+
+# डेटाबेस लोड करना
+def load_data():
+    try:
+        with open('artist_data.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+# रिल्स लिंक के साथ प्रोफाइल अपडेट करना
+def add_reel(username):
+    reel_url = input("अपने काम की रील लिंक (Instagram/Drive link) पेस्ट करें: ")
+    data = load_data()
+    for artist in data:
+        if artist['username'] == username:
+            artist['reel_url'] = reel_url
+            break
+    
+    with open('artist_data.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=4)
+    print("आपकी रील सफलतापूर्वक अपलोड हो गई है!")
+
+# प्रगत फिल्टर (Advanced Search)
+def advanced_search():
+    data = load_data()
+    print("\n--- कलाकार खोजें (Search Artists) ---")
+    city_filter = input("शहर का नाम (उदा. Jamner): ")
+    cat_filter = input("कला का प्रकार (उदा. Painter/Artist): ")
+
+    results = [a for a in data if a['city'].lower() == city_filter.lower() and a['category'].lower() == cat_filter.lower()]
+
+    if results:
+        print(f"\n{len(results)} कलाकार मिले:")
+        for r in results:
+            reel = r.get('reel_url', 'रील उपलब्ध नहीं है')
+            print(f"- {r['name']} | अनुभव: {r['experience']} साल | रील लिंक: {reel}")
+    else:
+        print("माफ करें, इस शहर में इस प्रकार के कलाकार अभी उपलब्ध नहीं हैं।")
